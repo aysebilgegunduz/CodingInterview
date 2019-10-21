@@ -18,10 +18,31 @@ supply of coins, therefore, each coin can be chosen multiple times.
 import math
 
 def count_change(denominations, total):
-    dp = [[-1 for _ in range(total+1)] for _ in range(len(denominations))]
+    #dp = [[-1 for _ in range(total+1)] for _ in range(len(denominations))]
+    #------recursive solution--------#
     #result = count_change_recursive(denominations, total, 0)
-    result = count_change_memo(dp, denominations,total,0)
-    return -1 if result == math.inf else result
+
+    #------Top-down memoisation solution--------#
+    #result = count_change_memo(dp, denominations,total,0)
+    #return -1 if result == math.inf else result
+    #-------Bottom-up solution----------#
+    """time and space complexity of O(C*T)O(C∗T), where ‘C’
+    represents total coin denominations and ‘T’ is the total amount that we want to make change."""
+    dp = [[math.inf for _ in range(total+1)] for _ in range(len(denominations))]
+    n = len(denominations)
+    # populate the total=0 columns, as we don't need any coin to make zero total
+    for i in range(n):
+        dp[i][0] = 0
+    for i in range(n):
+        for j in range(1, total+1):
+            if i>0:
+                dp[i][t] = dp[i-1][j]
+            if j >= denominations[i]:
+                 if dp[i][j - denominations[i]] != math.inf:
+                     dp[i][j] = min(dp[i][j], dp[i][j-denominations[i]]+1)
+    return -1 if dp[n-1][total] == math.inf else dp[n-1][total]
+
+
 def count_change_memo(dp, denominations, total, currentIndex):
     #base check
     if total == 0:
@@ -38,6 +59,7 @@ def count_change_memo(dp, denominations, total, currentIndex):
                 count1 = res+1
         count2 = count_change_memo(dp, denominations, total, currentIndex+1)
         dp[currentIndex][total] = min(count1,count2)
+    return dp[currentIndex][total]
 def count_change_recursive(denominations, total, currentIndex):
     #base check
     if total == 0:
